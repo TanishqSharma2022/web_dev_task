@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const cors = require('cors')
 const colors = require("colors")
 const dotenv = require("dotenv")
 const path = require("path")
@@ -12,7 +13,11 @@ const { Notfound, ErrorHandler } = require("./middleware/errormidleware");
 const chatRouter = require('./Routes/chatRouter');
 connectDB();
 
-
+app.use(cors({
+    origin: "http://localhost:5173",
+    methods: ['GET', 'POST'],
+    credentials: true
+}))
 
 
 app.use(express.json());
@@ -35,11 +40,13 @@ const io = require('socket.io')(server, {
         // Configure CORS to allow the backend socket to connect with the frontend socket
         // This is necessary when the frontend and backend are running on different ports
         // In this case, the frontend is running on http://localhost:3000
-        origin: "http://localhost:3000",
+        origin: ["http://localhost:5173"],
+        methods: ['GET', 'POST'],
+        credentials: true
     }
 })
 io.on('connection', (socket) => {
-    // console.log('connected to socket.io')
+    console.log('connected to socket.io')
 
     socket.on('setup', (userData) => {
         socket.join(userData._id);
